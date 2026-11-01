@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Khan Restaurant · mobile menu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-image: 
+                linear-gradient(135deg, rgba(180, 95, 43, 0.7), rgba(62, 44, 27, 0.9)),
+                url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 16px 12px 120px; /* Space for the fixed bottom cart */
+        }
+
+        /* ✨ MAIN GLASSMORPHISM CONTAINER ✨ */
+        .menu-container {
+            max-width: 480px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 32px;
+            padding: 24px 20px 32px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.6);
+            border-left: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .restaurant-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .restaurant-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .restaurant-header h1 i { color: #ffb703; }
+
+        .restaurant-header .tagline {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: inline-block;
+            padding: 4px 16px;
+            border-radius: 50px;
+            margin-top: 6px;
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: none;
+            background: transparent;
+            font-size: 1rem;
+        }
+
+        .tab-btn.active {
+            background: #ffb703;
+            color: #3e2c1b;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* TABLE INPUT */
+        .table-box {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 16px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .table-box label { color: #fff; font-weight: 700; font-size: 1rem; }
+        .table-box input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #3e2c1b;
+            outline: none;
+            text-align: center;
+        }
+
+        /* MENU SECTIONS */
+        .menu-section { display: none; }
+        .menu-section.active { display: block; }
+
+        /* DISH CARDS */
+        .dish-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.2); 
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: 0.2s;
+        }
+
+        .dish-img {
+            width: 55px;
+            height: 55px;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-right: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            flex-shrink: 0;
+        }
+
+        .dish-info { flex: 1; min-width: 0; }
+        .dish-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #ffffff;
+            margin-bottom: 4px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .dish-price {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #ffb703;
+        }
+
+        /* CONTROLS (Qty / Half-Full) */
+        .dish-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+        }
+
+        .qty-selector {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 2px;
+        }
+        .qty-btn {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .qty-btn:active { transform: scale(0.9); }
+        .qty-val {
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.9rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .type-selector {
+            display: flex;
+            gap: 4px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 2px;
+        }
+        .type-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .type-btn.active {
+            background: #25D366;
+            color: #fff;
+        }
+
+        /* FIXED BOTTOM CART */
+        .cart-bar {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 24px);
+            max-width: 456px;
+            background: rgba(30, 20, 10, 0.85);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 100;
+        }
+
+        .cart-total {
+            color: #fff;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .cart-total span {
+            color: #ffb703;
+            font-size: 1.2rem;
+        }
+
+        .order-btn {
+            background: #25D366;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+            transition: 0.2s;
+        }
+        .order-btn:active {
+            transform: scale(0.95);
+            background: #1eb356;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #333;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: 0.3s;
+            z-index: 200;
+            opacity: 0;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast" id="toast">Item added to cart!</div>
+
+    <div class="menu-container">
+        <div class="restaurant-header">
+            <h1><i class="fas fa-utensils"></i> Khan Restaurant</h1>
+            <div class="tagline"><i class="fas fa-star"></i> authentic taste · since 2010</div>
+        </div>
+
+        <!-- Table Input -->
+        <div class="table-box">
+            <label for="tableNo"><i class="fas fa-chair"></i> Table</label>
+            <input type="number" id="tableNo" placeholder="Enter Table No." min="1">
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('lunch')">🍛 Lunch</button>
+            <button class="tab-btn" onclick="switchTab('drinks')">🥤 Drinks</button>
+        </div>
+
+        <!-- LUNCH SECTION -->
+        <div id="section-lunch" class="menu-section active">
+            <!-- Chicken Lumbini -->
+            <div class="dish-item">
+                <img src="https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=200&q=80" class="dish-img" alt="Chicken Lumbini">
+                <div class="dish-info">
+                    <div class="dish-name">Chicken Lumbini</div>
+                    <div class="dish-price">Rs 400 <span style="font-size:0.7rem; color:#fff; opacity:0.7;">(Half: Rs 220)</span></div>
+                </div>
+                <div class="dish-controls">
+                    <div class="type-selector">
+                        <button class="type-btn active" onclick="setType(this, 'Chicken Lumbini', 'Full')">Full</button>
+                        <button class="type-btn" onclick="setType(this, 'Chicken Lumbini', 'Half')">Half</button>
+                    </div>
+                    <div class="qty-selector">
+                        <button class="qty-btn" onclick="updateQty(this, 'Chicken Lumbini', -1, 400, 220)">-</button>
+                        <div class="qty-val" id="qty-Chicken-Lumbini">0</div>
+                        <button class="qty-btn" onclick="updateQty(this, 'Chicken Lumbini', 1, 400, 220)">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chicken Biryani -->
+            <div class="dish-item">
+                <img src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=200&q=80" class="dish-img" alt="Chicken Biryani">
+                <div class="dish-info">
+                    <div class="dish-name">Chicken Biryani</div>
+                    <div class="dish-price">Rs 350 <span style="font-size:0.7rem; color:#fff; opacity:0.7;">(Half: Rs 200)</span></div>
+                </div>
+                <div class="dish-controls">
+                    <div class="type-selector">
+                        <button class="type-btn active" onclick="setType(this, 'Chicken Biryani', 'Full')">Full</button>
+                        <button class="type-btn" onclick="setType(this, 'Chicken Biryani', 'Half')">Half</button>
+                    </div>
+                    <div class="qty-selector">
+                        <button class="qty-btn" onclick="updateQty(this, 'Chicken Biryani', -1, 350, 200)">-</button>
+                        <div class="qty-val" id="qty-Chicken-Biryani">0</div>
+                        <button class="qty-btn" onclick="updateQty(this, 'Chicken Biryani', 1, 350, 200)">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mutton Curry -->
+            <div class="dish-item">
+                <img src="https://images.unsplash.com/photo-1545247181-516773cae754?auto=format&fit=crop&w=200&q=80" class="dish-img" alt="Mutton Curry">
+                <div class="dish-info">
+                    <div class="dish-name">Mutton Curry</div>
+                    <div class="dish-price">Rs 550 <span style="font-size:0.7rem; color:#fff; opacity:0.7;">(Half: Rs 300)</span></div>
+                </div>
+                <div class="dish-controls">
+                    <div class="type-selector">
+                        <button class="type-btn active" onclick="setType(this, 'Mutton Curry', 'Full')">Full</button>
+                        <button class="type-btn" onclick="setType(this, 'Mutton Curry', 'Half')">Half</button>
+                    </div>
+                    <div class="qty-selector">
+                        <button class="qty-btn" onclick="updateQty(this, 'Mutton Curry', -1, 550, 300)">-</button>
+                        <div class="qty-val" id="qty-Mutton-Curry">0</div>
+                        <button class="qty-btn" onclick="updateQty(this, 'Mutton Curry', 1, 550, 300)">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Garlic Naan -->
+            <div class="dish-item">
+                <img src="https://images.unsplash.com/photo-1610057099431-d73a1c9d2f2f?auto=format&fit=crop&w=200&q=80" class="dish-img" alt="Garlic Naan">
+                <div class="dish-info">
+                    <div class="dish-name">Garlic Naan</div>
+                    <div class="dish-price">Rs 90</div>
+                </div>
+                <div class="dish-controls">
+                    <div class="qty-selector">
+                        <button class="qty-btn" onclick="updateQty(this, 'Garlic Naan', -1, 90, 90)">-</button>
+                        <div class="qty-val" id="qty-Garlic-Naan">0</div>
+                        <button class="qty-btn" onclick="updateQty(this, 'Garlic Naan', 1, 90, 90)">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DRINKS SECTION -->
+        <div id="section-drinks" class="menu-section">
+            <!-- Coca Cola -->
+            <div class="dish-item">
+                <img src="https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=200&q=80" class="dish-img" alt="Coca Cola">
+                <div class="dish-info">
+                    <div class="dish-name">Coca Cola</div>
+                    <div class="dish-price">Rs 60</div>
+                </div>
+                <div class="dish-controls">
+                    <div class="qty-selector">
+                        <button class="qty-btn" onclick="updateQty(this, 'Coca Cola', -1, 60, 60)">-</button>
+                        <div class="qty-val" id="qty-Coca-Cola">0</div>
+                        <button class="qty-btn" onclick="updateQty(this, 'Coca Cola', 1, 60, 60)">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pepsi -->
+            <div class="dish-item">
+                <img src="https://images.unsplash.com/photo-1629203849820-fdd70d49c38e?auto=format&fit=crop&w=200&q=80" class="dish-img" alt="Pepsi">
+                <div class="dish-info">
+                    <div class="dish-name">Pepsi</div>
+                    <div class="dish-price">Rs 60</div>
+                </div>
+                <div class="dish-controls">
+                    <div class="qty-selector">
+                        <button class="qty-btn" onclick="updateQty(this, 'Pepsi', -1, 60, 60)">-</button>
+                        <div class="qty-val" id="qty-Pepsi">0</div>
+                        <button class="qty-btn" onclick="updateQty(this, 'Pepsi', 1, 60, 60)">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Red Bull -->
+            <div class="dish-item">
+                <img src="https://images.unsplash.com/photo-1622543925917-763c34d1a86e?auto=format&fit=crop&w=200&q=80" class="dish-img" alt="Red Bull">
+                <div class="dish-info">
+                    <div class="dish-name">Red Bull</div>
+                    <div class="dish-price">Rs 150</div>
+                </div>
+                <div class="dish-controls">
+                    <div class="qty-selector">
+                        <button class="qty-btn" onclick="updateQty(this, 'Red Bull', -1, 150, 150)">-</button>
+                        <div class="qty-val" id="qty-Red-Bull">0</div>
+                        <button class="qty-btn" onclick="updateQty(this, 'Red Bull', 1, 150, 150)">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sprite -->
+            <div class="dish-item">
+                <img src="https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?auto=format&fit=crop&w=200&q=80" class="dish-img" alt="Sprite">
+                <div class="dish-info">
+                    <div class="dish-name">Sprite</div>
+                    <div class="dish-price">Rs 60</div>
+                </div>
+                <div class="dish-controls">
+                    <div class="qty-selector">
+                        <button class="qty-btn" onclick="updateQty(this, 'Sprite', -1, 60, 60)">-</button>
+                        <div class="qty-val" id="qty-Sprite">0</div>
+                        <button class="qty-btn" onclick="updateQty(this, 'Sprite', 1, 60, 60)">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Beer -->
+            <div class="dish-item">
+                <img src="https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=200&q=80" class="dish-img" alt="Beer">
+                <div class="dish-info">
+                    <div class="dish-name">Beer</div>
+                    <div class="dish-price">Rs 350</div>
+                </div>
+                <div class="dish-controls">
+                    <div class="qty-selector">
+                        <button class="qty-btn" onclick="updateQty(this, 'Beer', -1, 350, 350)">-</button>
+                        <div class="qty-val" id="qty-Beer">0</div>
+                        <button class="qty-btn" onclick="updateQty(this, 'Beer', 1, 350, 350)">+</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mango Lassi -->
+            <div class="dish-item">
+                <img src="https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=200&q=80" class="dish-img" alt="Mango Lassi">
+                <div class="dish-info">
+                    <div class="dish-name">Mango Lassi</div>
+                    <div class="dish-price">Rs 150</div>
+                </div>
+                <div class="dish-controls">
+                    <div class="qty-selector">
+                        <button class="qty-btn" onclick="updateQty(this, 'Mango Lassi', -1, 150, 150)">-</button>
+                        <div class="qty-val" id="qty-Mango-Lassi">0</div>
+                        <button class="qty-btn" onclick="updateQty(this, 'Mango Lassi', 1, 150, 150)">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fixed Bottom Cart -->
+    <div class="cart-bar">
+        <div class="cart-total">Total: <span id="totalAmount">Rs 0</span></div>
+        <button class="order-btn" onclick="sendOrder()">
+            <i class="fab fa-whatsapp"></i> Order Now
+        </button>
+    </div>
+
+    <script>
+        // Cart structure: { "DishName|Type": { qty: 1, price: 350, name: "DishName", type: "Full" } }
+        let cart = {};
+
+        // Show toast notification
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        // Switch Tabs
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.menu-section').forEach(sec => sec.classList.remove('active'));
+            
+            if(tab === 'lunch') {
+                document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+                document.getElementById('section-lunch').classList.add('active');
+            } else {
+                document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+                document.getElementById('section-drinks').classList.add('active');
+            }
+        }
+
+        // Set Full or Half type
+        function setType(btn, dishName, type) {
+            // Reset siblings
+            const parent = btn.parentElement;
+            parent.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Update the specific dish id tracking for qty
+            const dishId = dishName.replace(/\s+/g, '-');
+            document.getElementById('qty-' + dishId).dataset.type = type;
+        }
+
+        // Update Quantity
+        function updateQty(btn, dishName, change, fullPrice, halfPrice) {
+            const dishId = dishName.replace(/\s+/g, '-');
+            const qtyDisplay = document.getElementById('qty-' + dishId);
+            
+            // Determine selected type
+            let type = 'Full';
+            const typeSelector = btn.closest('.dish-controls').querySelector('.type-selector');
+            if (typeSelector) {
+                const activeBtn = typeSelector.querySelector('.type-btn.active');
+                if (activeBtn) type = activeBtn.textContent.trim();
+            }
+
+            let price = (type === 'Half') ? halfPrice : fullPrice;
+            let cartKey = dishName + '|' + type;
+
+            if (!cart[cartKey]) {
+                cart[cartKey] = { name: dishName, type: type, qty: 0, price: price };
+            }
+
+            cart[cartKey].qty += change;
+
+            if (cart[cartKey].qty <= 0) {
+                delete cart[cartKey];
+                qtyDisplay.textContent = 0;
+            } else {
+                qtyDisplay.textContent = cart[cartKey].qty;
+                if(change > 0) showToast(`${dishName} (${type}) added!`);
+            }
+
+            updateTotal();
+        }
+
+        // Calculate Total
+        function updateTotal() {
+            let total = 0;
+            for (let key in cart) {
+                total += cart[key].qty * cart[key].price;
+            }
+            document.getElementById('totalAmount').textContent = 'Rs ' + total;
+        }
+
+        // Send Order to WhatsApp
+        function sendOrder() {
+            const tableNo = document.getElementById('tableNo').value.trim();
+            
+            if (!tableNo) {
+                alert("Kripya Table Number daalein!");
+                document.getElementById('tableNo').focus();
+                return;
+            }
+
+            if (Object.keys(cart).length === 0) {
+                alert("Aapne koi item select nahi kiya!");
+                return;
+            }
+
+            let message = `🍽️ *New Order — Khan Restaurant*%0A`;
+            message += `🪑 *Table No: ${tableNo}*%0A%0A`;
+            message += `📋 *Order Details:*%0A`;
+            
+            let total = 0;
+            for (let key in cart) {
+                let item = cart[key];
+                let itemTotal = item.qty * item.price;
+                total += itemTotal;
+                message += `• ${item.qty}x ${item.name} (${item.type}) - Rs ${itemTotal}%0A`;
+            }
+
+            message += `%0A💰 *Total Amount: Rs ${total}*%0A%0A`;
+            message += `Please confirm my order. Thank you!`;
+
+            const waURL = `https://wa.me/9811575711?text=${message}`;
+            window.open(waURL, '_blank');
+        }
+    </script>
+</body>
+</html>
